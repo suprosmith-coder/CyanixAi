@@ -787,11 +787,8 @@
                     Groq API Key 
                     <span class="api-status" id="groqStatus">Not Configured</span>
                 </label>
-                <input type="password" id="groqKeyInput" placeholder="gsk_..." autocomplete="off" />
+                <input type="password" id="groqKeyInput" placeholder="gsk_...">
                 <small>Get free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a></small>
-                <small style="display: block; margin-top: 4px; color: #FF3B30; font-weight: 600;">
-                    ⚠️ Make sure to copy the FULL key (starts with gsk_)
-                </small>
             </div>
 
             <div class="api-input-group">
@@ -816,6 +813,37 @@
         let currentMode = 'default';
         let autoSpeak = true;
         let isOnline = true;
+
+        // Personality - Hidden from users, embedded in code
+        const PERSONALITY = `You are Cyanix AI, a highly intelligent and helpful assistant.
+
+Core Traits:
+- Friendly, approachable, and conversational
+- Clear and concise in explanations
+- Patient and understanding
+- Proactive in offering help
+- Professional yet warm
+
+Communication Style:
+- Use natural, everyday language
+- Avoid overly technical jargon unless requested
+- Be encouraging and positive
+- Show empathy and understanding
+- Adapt tone to match the user's mood
+
+Capabilities:
+- Answer questions on a wide range of topics
+- Help with problem-solving and decision-making
+- Provide explanations and tutorials
+- Assist with creative tasks and brainstorming
+- Offer practical advice and recommendations
+
+Remember:
+- You're here to help and support the user
+- Be honest when you don't know something
+- Maintain a helpful and respectful demeanor
+- Focus on being genuinely useful
+-You Where Create by Blueey`;
 
         // API Configuration - Users enter their own keys
         const API_CONFIG = {
@@ -975,8 +1003,10 @@
                 throw new Error('No API keys configured. Please click "Configure API Keys" in the menu.');
             }
 
-            // Build conversation context
-            const systemPrompt = `You are Cyanix AI, an intelligent assistant speaking to ${currentUser}. ${getModeInstructions()}`;
+            // Build conversation context with personality
+            const systemPrompt = `${PERSONALITY}
+
+You are speaking to ${currentUser}. ${getModeInstructions()}`;
             
             // Get recent chat history for context (last 10 messages)
             const recentHistory = chatHistory.slice(-10).map(msg => ({
@@ -1241,54 +1271,7 @@
             updateAPIStatus();
             closeAPIKeyDialog();
             
-            // Test the API key
-            if (groqKey) {
-                testAPIKey();
-            } else {
-                addMessage('API keys saved successfully!', false);
-            }
-        }
-
-        async function testAPIKey() {
-            addMessage('Testing API connection...', false);
-            
-            try {
-                const response = await fetch(API_CONFIG.groq.endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${API_CONFIG.groq.key}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'llama-3.1-8b-instant',
-                        messages: [
-                            { role: 'user', content: 'Hi' }
-                        ],
-                        max_tokens: 50
-                    })
-                });
-
-                if (response.ok) {
-                    addMessage('✅ API key is working! You can now chat with AI.', false);
-                } else {
-                    const errorText = await response.text();
-                    let errorMsg = 'Unknown error';
-                    try {
-                        const errorData = JSON.parse(errorText);
-                        errorMsg = errorData.error?.message || errorData.message || errorMsg;
-                    } catch (e) {
-                        errorMsg = errorText;
-                    }
-                    
-                    if (response.status === 401) {
-                        addMessage('❌ Invalid API key. Please check your key and try again. Get a key at console.groq.com', false);
-                    } else {
-                        addMessage(`❌ API Error (${response.status}): ${errorMsg}`, false);
-                    }
-                }
-            } catch (error) {
-                addMessage(`❌ Connection error: ${error.message}. Please check your internet connection.`, false);
-            }
+            addMessage('API keys saved successfully! You can now chat with AI.', false);
         }
 
         function updateAPIStatus() {
