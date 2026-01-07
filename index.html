@@ -27,18 +27,21 @@
             justify-content: center;
             height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-y: auto;
+            padding: 20px 0;
         }
 
         .login-container {
             background: white;
             border-radius: 24px;
-            padding: 48px 32px;
+            padding: 40px 32px;
             width: 90%;
-            max-width: 400px;
-            max-height: 90vh;
+            max-width: 420px;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
+            margin: auto;
         }
 
         .app-icon {
@@ -46,7 +49,7 @@
             height: 100px;
             background: linear-gradient(135deg, #007AFF, #0051D5);
             border-radius: 22px;
-            margin: 0 auto 24px;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -64,21 +67,23 @@
         .login-subtitle {
             font-size: 16px;
             color: #666;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .input-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            text-align: left;
         }
 
         .text-input {
             width: 100%;
-            padding: 16px;
+            padding: 14px 16px;
             border: 2px solid #E5E5EA;
             border-radius: 12px;
             font-size: 16px;
             transition: all 0.3s;
             background: white;
+            box-sizing: border-box;
         }
 
         .text-input:focus {
@@ -100,9 +105,16 @@
             text-decoration: underline;
         }
 
+        .login-note {
+            font-size: 13px;
+            color: #999;
+            margin-top: 16px;
+            line-height: 1.4;
+        }
+
         .primary-btn {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             background: #007AFF;
             color: white;
             border: none;
@@ -111,6 +123,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            margin-top: 8px;
         }
 
         .primary-btn:hover {
@@ -674,15 +687,15 @@
             
             <div class="input-group">
                 <input type="password" id="apiKeyLoginInput" class="text-input" placeholder="Enter Groq API Key (optional)" />
-                <small style="font-size: 12px; color: #666; display: block; margin-top: 4px; text-align: left;">
-                    Get free key at <a href="https://console.groq.com" target="_blank" style="color: #007AFF;">console.groq.com</a>
+                <small style="font-size: 12px; color: #666; display: block; margin-top: 6px;">
+                    Get free key at <a href="https://console.groq.com" target="_blank" style="color: #007AFF; text-decoration: none;">console.groq.com</a>
                 </small>
             </div>
             
             <button class="primary-btn" onclick="login()">Continue</button>
             
-            <p style="font-size: 13px; color: #999; margin-top: 16px;">
-                You can also configure API keys later in settings
+            <p class="login-note">
+                💡 You can also configure API keys later in settings
             </p>
         </div>
     </div>
@@ -774,8 +787,11 @@
                     Groq API Key 
                     <span class="api-status" id="groqStatus">Not Configured</span>
                 </label>
-                <input type="password" id="groqKeyInput" placeholder="gsk_...">
+                <input type="password" id="groqKeyInput" placeholder="gsk_..." autocomplete="off" />
                 <small>Get free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a></small>
+                <small style="display: block; margin-top: 4px; color: #FF3B30; font-weight: 600;">
+                    ⚠️ Make sure to copy the FULL key (starts with gsk_)
+                </small>
             </div>
 
             <div class="api-input-group">
@@ -1024,8 +1040,26 @@
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || 'API request failed');
+                const errorText = await response.text();
+                let errorMessage = 'API request failed';
+                
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.error?.message || errorData.message || errorMessage;
+                } catch (e) {
+                    errorMessage = errorText;
+                }
+                
+                // Check for specific error types
+                if (response.status === 401) {
+                    throw new Error('Invalid API key. Please check your Groq API key in settings.');
+                } else if (response.status === 429) {
+                    throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+                } else if (response.status === 500 || response.status === 502 || response.status === 503) {
+                    throw new Error('Groq service is temporarily unavailable. Please try again in a moment.');
+                } else {
+                    throw new Error(`Groq API Error (${response.status}): ${errorMessage}`);
+                }
             }
 
             const data = await response.json();
@@ -1207,7 +1241,54 @@
             updateAPIStatus();
             closeAPIKeyDialog();
             
-            addMessage('API keys saved successfully! You can now chat with AI.', false);
+            // Test the API key
+            if (groqKey) {
+                testAPIKey();
+            } else {
+                addMessage('API keys saved successfully!', false);
+            }
+        }
+
+        async function testAPIKey() {
+            addMessage('Testing API connection...', false);
+            
+            try {
+                const response = await fetch(API_CONFIG.groq.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_CONFIG.groq.key}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: [
+                            { role: 'user', content: 'Hi' }
+                        ],
+                        max_tokens: 50
+                    })
+                });
+
+                if (response.ok) {
+                    addMessage('✅ API key is working! You can now chat with AI.', false);
+                } else {
+                    const errorText = await response.text();
+                    let errorMsg = 'Unknown error';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMsg = errorData.error?.message || errorData.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = errorText;
+                    }
+                    
+                    if (response.status === 401) {
+                        addMessage('❌ Invalid API key. Please check your key and try again. Get a key at console.groq.com', false);
+                    } else {
+                        addMessage(`❌ API Error (${response.status}): ${errorMsg}`, false);
+                    }
+                }
+            } catch (error) {
+                addMessage(`❌ Connection error: ${error.message}. Please check your internet connection.`, false);
+            }
         }
 
         function updateAPIStatus() {
