@@ -35,6 +35,8 @@
             padding: 48px 32px;
             width: 90%;
             max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
@@ -83,6 +85,19 @@
             outline: none;
             border-color: #007AFF;
             box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .text-input::placeholder {
+            color: #999;
+        }
+
+        .input-group small a {
+            color: #007AFF;
+            text-decoration: none;
+        }
+
+        .input-group small a:hover {
+            text-decoration: underline;
         }
 
         .primary-btn {
@@ -652,10 +667,23 @@
             <div class="app-icon">🤖</div>
             <h1 class="login-title">Cyanix AI</h1>
             <p class="login-subtitle">Your intelligent assistant</p>
+            
             <div class="input-group">
                 <input type="text" id="usernameInput" class="text-input" placeholder="Enter your name" />
             </div>
+            
+            <div class="input-group">
+                <input type="password" id="apiKeyLoginInput" class="text-input" placeholder="Enter Groq API Key (optional)" />
+                <small style="font-size: 12px; color: #666; display: block; margin-top: 4px; text-align: left;">
+                    Get free key at <a href="https://console.groq.com" target="_blank" style="color: #007AFF;">console.groq.com</a>
+                </small>
+            </div>
+            
             <button class="primary-btn" onclick="login()">Continue</button>
+            
+            <p style="font-size: 13px; color: #999; margin-top: 16px;">
+                You can also configure API keys later in settings
+            </p>
         </div>
     </div>
 
@@ -804,7 +832,17 @@
 
         function login() {
             const username = document.getElementById('usernameInput').value.trim();
-            if (!username) return;
+            if (!username) {
+                alert('Please enter your name');
+                return;
+            }
+
+            // Get API key from login screen if provided
+            const apiKeyFromLogin = document.getElementById('apiKeyLoginInput').value.trim();
+            if (apiKeyFromLogin) {
+                localStorage.setItem('groq_api_key', apiKeyFromLogin);
+                API_CONFIG.groq.key = apiKeyFromLogin;
+            }
 
             currentUser = username;
             document.getElementById('userName').textContent = username;
