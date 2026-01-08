@@ -26,6 +26,7 @@
             --purple-deep: #1a0633;
             --purple-dark: #0d0221;
             --neon-glow: 0 0 10px var(--cyan-neon), 0 0 20px var(--cyan-neon), 0 0 30px var(--cyan-neon);
+            --ship-glow: 0 0 15px var(--cyan-neon), 0 0 30px var(--cyan-neon), 0 0 45px var(--cyan-neon);
         }
 
         body {
@@ -37,17 +38,60 @@
             width: 100%;
         }
 
-        /* Animated Space Background */
-        .space-background {
+        /* Milky Way Galaxy Background */
+        .galaxy-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #0d0221 0%, #1a0633 50%, #2d1b69 100%);
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(157, 78, 221, 0.3) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 243, 255, 0.3) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(45, 27, 105, 0.6) 0%, transparent 70%),
+                linear-gradient(135deg, #0d0221 0%, #1a0633 30%, #2d1b69 70%, #0d0221 100%);
             z-index: -1;
             overflow: hidden;
         }
+
+        .galaxy-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 180, 0.4) 20%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.7;
+            transform: translate(-50%, -50%);
+            animation: corePulse 8s infinite alternate;
+        }
+
+        @keyframes corePulse {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .galaxy-arm {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 400px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            box-shadow: 
+                0 0 100px rgba(157, 78, 221, 0.3),
+                0 0 200px rgba(157, 78, 221, 0.2),
+                0 0 300px rgba(157, 78, 221, 0.1);
+            transform: translate(-50%, -50%) rotate(var(--rotation));
+            opacity: 0.4;
+        }
+
+        .arm-1 { --rotation: 0deg; }
+        .arm-2 { --rotation: 120deg; }
+        .arm-3 { --rotation: 240deg; }
 
         .stars {
             position: absolute;
@@ -62,52 +106,114 @@
             animation: twinkle 3s infinite;
         }
 
+        .star.large {
+            width: 3px;
+            height: 3px;
+            box-shadow: 0 0 10px white, 0 0 20px white;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            box-shadow: 0 0 5px white, 0 0 10px white;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+            box-shadow: 0 0 3px white;
+        }
+
         @keyframes twinkle {
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        .nebula {
+        /* Spaceships */
+        .spaceship {
             position: absolute;
+            z-index: 2;
+            filter: drop-shadow(0 0 10px var(--cyan-neon));
+        }
+
+        .spaceship.large {
+            width: 60px;
+            height: 30px;
+        }
+
+        .spaceship.medium {
+            width: 40px;
+            height: 20px;
+        }
+
+        .spaceship.small {
+            width: 20px;
+            height: 10px;
+        }
+
+        .spaceship-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(0, 243, 255, 0.1) 0%,
+                rgba(0, 243, 255, 0.8) 50%,
+                rgba(0, 243, 255, 0.1) 100%);
+            clip-path: polygon(0% 0%, 80% 0%, 100% 50%, 80% 100%, 0% 100%);
+            border-radius: 4px;
+        }
+
+        .spaceship-wings {
+            position: absolute;
+            width: 120%;
+            height: 40%;
+            top: 30%;
+            left: -10%;
+            background: linear-gradient(90deg, 
+                transparent 0%,
+                rgba(0, 243, 255, 0.4) 30%,
+                rgba(0, 243, 255, 0.8) 50%,
+                rgba(0, 243, 255, 0.4) 70%,
+                transparent 100%);
+            clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+        }
+
+        .spaceship-engine {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 15px;
+            background: radial-gradient(circle, 
+                rgba(255, 100, 100, 0.9) 0%,
+                rgba(255, 50, 50, 0.8) 50%,
+                transparent 70%);
             border-radius: 50%;
-            filter: blur(60px);
-            animation: float 20s infinite ease-in-out;
-            opacity: 0.3;
+            animation: enginePulse 0.5s infinite alternate;
         }
 
-        .nebula-1 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, var(--cyan-neon) 0%, transparent 70%);
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
+        @keyframes enginePulse {
+            0% { opacity: 0.5; transform: translateY(-50%) scale(0.8); }
+            100% { opacity: 1; transform: translateY(-50%) scale(1.2); }
         }
 
-        .nebula-2 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, #9d4edd 0%, transparent 70%);
-            top: 60%;
-            right: 10%;
-            animation-delay: -10s;
+        .engine-trail {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                rgba(255, 50, 50, 0.8) 0%,
+                rgba(255, 150, 50, 0.6) 30%,
+                rgba(0, 243, 255, 0.3) 70%,
+                transparent 100%);
+            border-radius: 2px;
         }
 
-        .nebula-3 {
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, var(--cyan-bright) 0%, transparent 70%);
-            bottom: 20%;
-            left: 50%;
-            animation-delay: -5s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-
+        /* Shooting stars */
         .shooting-star {
             position: absolute;
             width: 2px;
@@ -141,32 +247,6 @@
         @keyframes gridMove {
             0% { transform: translateY(0); }
             100% { transform: translateY(50px); }
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background: var(--cyan-neon);
-            box-shadow: 0 0 10px var(--cyan-neon);
-            opacity: 0;
-            animation: particleFloat 15s infinite;
-        }
-
-        @keyframes particleFloat {
-            0% { 
-                transform: translateY(100vh) translateX(0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% { 
-                transform: translateY(-100vh) translateX(100px) scale(1);
-                opacity: 0;
-            }
         }
 
         .scanline {
@@ -212,6 +292,8 @@
             text-align: center;
             margin: auto;
             animation: loginPulse 2s infinite alternate;
+            position: relative;
+            z-index: 100;
         }
 
         @keyframes loginPulse {
@@ -368,11 +450,12 @@
             flex-direction: column;
             height: 100vh;
             height: 100dvh;
-            background: var(--purple-dark);
+            background: transparent;
             position: fixed;
             width: 100%;
             top: 0;
             left: 0;
+            z-index: 100;
         }
 
         .chat-screen.active {
@@ -489,6 +572,7 @@
             -webkit-overflow-scrolling: touch;
             min-height: 0;
             position: relative;
+            backdrop-filter: blur(2px);
         }
 
         .chat-container::-webkit-scrollbar {
@@ -767,6 +851,18 @@
         .menu-btn-item.danger:hover {
             background: rgba(255, 0, 110, 0.1);
             box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
+        }
+
+        .menu-btn-item.install-btn {
+            background: linear-gradient(135deg, rgba(0, 168, 181, 0.3), rgba(0, 243, 255, 0.2));
+            border: 1px solid var(--cyan-neon);
+            color: var(--cyan-neon);
+            text-shadow: 0 0 10px var(--cyan-neon);
+        }
+
+        .menu-btn-item.install-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 168, 181, 0.4), rgba(0, 243, 255, 0.3));
+            box-shadow: var(--neon-glow);
         }
 
         .settings-card {
@@ -1065,24 +1161,168 @@
                 opacity: 1;
             }
         }
+
+        .install-status {
+            padding: 8px 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .install-status.installed {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--cyan-neon);
+            border: 1px solid var(--cyan-neon);
+        }
+
+        .install-status.available {
+            background: rgba(157, 78, 221, 0.1);
+            color: #9d4edd;
+            border: 1px solid #9d4edd;
+        }
+
+        .install-status.not-available {
+            background: rgba(255, 0, 110, 0.1);
+            color: #ff006e;
+            border: 1px solid #ff006e;
+        }
+
+        /* Install Prompt Popup */
+        .install-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(13, 2, 33, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--cyan-neon);
+            box-shadow: var(--neon-glow);
+            border-radius: 16px;
+            padding: 20px;
+            width: 300px;
+            z-index: 9998;
+            animation: slideIn 0.5s ease;
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .install-popup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .install-popup-icon {
+            font-size: 24px;
+            color: var(--cyan-neon);
+        }
+
+        .install-popup-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--cyan-neon);
+            flex: 1;
+        }
+
+        .install-popup-close {
+            background: none;
+            border: none;
+            color: var(--cyan-bright);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .install-popup-close:hover {
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .install-popup-body {
+            color: var(--cyan-bright);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .install-popup-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .install-popup-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .install-popup-btn.primary {
+            background: linear-gradient(135deg, var(--cyan-dark), var(--cyan-bright));
+            color: var(--purple-dark);
+            border: 1px solid var(--cyan-neon);
+        }
+
+        .install-popup-btn.secondary {
+            background: rgba(0, 168, 181, 0.1);
+            color: var(--cyan-bright);
+            border: 1px solid var(--cyan-dark);
+        }
     </style>
 </head>
 <body>
-    <!-- Animated Space Background -->
-    <div class="space-background">
+    <!-- Milky Way Galaxy Background -->
+    <div class="galaxy-background">
+        <div class="galaxy-core"></div>
+        <div class="galaxy-arm arm-1"></div>
+        <div class="galaxy-arm arm-2"></div>
+        <div class="galaxy-arm arm-3"></div>
         <div class="stars" id="starsContainer"></div>
-        <div class="nebula nebula-1"></div>
-        <div class="nebula nebula-2"></div>
-        <div class="nebula nebula-3"></div>
+        <div id="spaceshipsContainer"></div>
         <div class="shooting-star" style="top: 20%; right: 80%; animation-delay: 0s;"></div>
         <div class="shooting-star" style="top: 50%; right: 60%; animation-delay: 2s;"></div>
         <div class="shooting-star" style="top: 70%; right: 40%; animation-delay: 4s;"></div>
         <div class="grid-overlay"></div>
-        <div id="particleContainer"></div>
     </div>
     
     <!-- Scan line effect -->
     <div class="scanline"></div>
+
+    <!-- Install Prompt Popup -->
+    <div id="installPopup" class="install-popup">
+        <div class="install-popup-header">
+            <div class="install-popup-icon">📲</div>
+            <div class="install-popup-title">Install Cyanix AI</div>
+            <button class="install-popup-close" onclick="hideInstallPopup()">×</button>
+        </div>
+        <div class="install-popup-body">
+            Install Cyanix AI on your home screen for quick access and offline use. 
+            Works just like a native app!
+        </div>
+        <div class="install-popup-buttons">
+            <button class="install-popup-btn secondary" onclick="hideInstallPopup()">Later</button>
+            <button class="install-popup-btn primary" onclick="installPWA()">Install Now</button>
+        </div>
+    </div>
 
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
@@ -1185,6 +1425,15 @@
         </div>
 
         <div class="menu-section">
+            <div class="menu-section-title">App Installation</div>
+            <div id="installStatus" class="install-status not-available">Checking installation status...</div>
+            <button class="menu-btn-item install-btn" onclick="installPWA()" id="installBtn" style="display: none;">
+                📲 Install Cyanix AI
+            </button>
+            <button class="menu-btn-item" onclick="showInstallInstructions()">📋 Installation Guide</button>
+        </div>
+
+        <div class="menu-section">
             <button class="menu-btn-item danger" onclick="logout()">🚪 Logout</button>
         </div>
     </div>
@@ -1224,56 +1473,135 @@
     </div>
 
     <script>
+        // Generate Milky Way Galaxy
+        function createGalaxy() {
+            createStars();
+            createSpaceships();
+        }
+
         // Generate animated stars
         function createStars() {
             const container = document.getElementById('starsContainer');
-            const starCount = 200;
+            const starCount = 300;
             
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
-                star.className = 'star';
+                const size = Math.random();
+                if (size > 0.7) {
+                    star.className = 'star large';
+                } else if (size > 0.4) {
+                    star.className = 'star medium';
+                } else {
+                    star.className = 'star small';
+                }
+                
                 star.style.left = Math.random() * 100 + '%';
                 star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 3 + 1 + 'px';
-                star.style.height = star.style.width;
                 star.style.animationDelay = Math.random() * 3 + 's';
                 star.style.animationDuration = (Math.random() * 3 + 2) + 's';
                 container.appendChild(star);
             }
         }
 
-        // Generate floating particles
-        function createParticles() {
-            const container = document.getElementById('particleContainer');
-            const particleCount = 20;
+        // Generate spaceships
+        function createSpaceships() {
+            const container = document.getElementById('spaceshipsContainer');
+            const shipCount = 5;
             
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.bottom = '-10px';
-                particle.style.width = Math.random() * 4 + 2 + 'px';
-                particle.style.height = particle.style.width;
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                container.appendChild(particle);
+            for (let i = 0; i < shipCount; i++) {
+                const spaceship = document.createElement('div');
+                const size = Math.random();
+                
+                if (size > 0.7) {
+                    spaceship.className = 'spaceship large';
+                } else if (size > 0.4) {
+                    spaceship.className = 'spaceship medium';
+                } else {
+                    spaceship.className = 'spaceship small';
+                }
+                
+                // Create spaceship parts
+                const body = document.createElement('div');
+                body.className = 'spaceship-body';
+                
+                const wings = document.createElement('div');
+                wings.className = 'spaceship-wings';
+                
+                const engine = document.createElement('div');
+                engine.className = 'spaceship-engine';
+                
+                const trail = document.createElement('div');
+                trail.className = 'engine-trail';
+                
+                spaceship.appendChild(body);
+                spaceship.appendChild(wings);
+                spaceship.appendChild(engine);
+                spaceship.appendChild(trail);
+                
+                // Random starting position
+                const startX = -100;
+                const startY = Math.random() * 100;
+                
+                // Random flight path
+                const endX = 100 + Math.random() * 50;
+                const endY = startY + (Math.random() * 40 - 20);
+                
+                // Random speed
+                const duration = 20 + Math.random() * 30;
+                const delay = Math.random() * 30;
+                
+                // Set initial position
+                spaceship.style.left = startX + 'px';
+                spaceship.style.top = startY + 'vh';
+                
+                // Animate
+                spaceship.style.animation = `
+                    flyShip ${duration}s linear ${delay}s infinite
+                `;
+                
+                // Define keyframes for this ship
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes flyShip-${i} {
+                        0% {
+                            transform: translate(0, 0) rotate(0deg);
+                            opacity: 0;
+                        }
+                        10% {
+                            opacity: 1;
+                        }
+                        90% {
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: translate(${endX}vw, ${endY}vh) rotate(${Math.random() * 360}deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                spaceship.style.animation = `flyShip-${i} ${duration}s linear ${delay}s infinite`;
+                container.appendChild(spaceship);
             }
         }
 
-        // Initialize stars and particles on load
+        // Initialize galaxy on load
         window.addEventListener('load', function() {
-            createStars();
-            createParticles();
+            createGalaxy();
         });
 
+        // Main Application Variables
         let currentUser = '';
         let chatHistory = [];
         let currentMode = 'default';
         let autoSpeak = true;
         let isOnline = true;
         let menuOpen = false;
+        let deferredPrompt = null;
+        let isAppInstalled = false;
 
-        // Personality - Hidden from users, embedded in code
+        // Personality
         const PERSONALITY = `You are Cyanix AI, a highly intelligent and helpful assistant.
 
 Core Traits:
@@ -1303,7 +1631,7 @@ Remember:
 - Maintain a helpful and respectful demeanor
 - Focus on being genuinely useful`;
 
-        // API Configuration - Users enter their own keys
+        // API Configuration
         const API_CONFIG = {
             groq: {
                 key: localStorage.getItem('groq_api_key') || '',
@@ -1334,6 +1662,155 @@ Remember:
             }
         }, 5000);
 
+        // =============== PWA Installation Functions ===============
+        function checkIfPWAInstalled() {
+            if (window.matchMedia('(display-mode: standalone)').matches) return true;
+            if (window.navigator.standalone === true) return true;
+            if (document.referrer.includes('android-app://')) return true;
+            return false;
+        }
+
+        function updateInstallStatus() {
+            const installBtn = document.getElementById('installBtn');
+            const installStatus = document.getElementById('installStatus');
+            
+            isAppInstalled = checkIfPWAInstalled();
+            
+            if (isAppInstalled) {
+                installStatus.innerHTML = '✅ Cyanix AI is installed';
+                installStatus.className = 'install-status installed';
+                if (installBtn) installBtn.style.display = 'none';
+            } else if (deferredPrompt) {
+                installStatus.innerHTML = '📲 Available for installation';
+                installStatus.className = 'install-status available';
+                if (installBtn) installBtn.style.display = 'block';
+            } else {
+                installStatus.innerHTML = 'ℹ️ Visit in Chrome/Safari to install';
+                installStatus.className = 'install-status not-available';
+                if (installBtn) installBtn.style.display = 'none';
+            }
+        }
+
+        // Listen for install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('📲 PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            updateInstallStatus();
+            
+            // Show automatic popup after 3 seconds
+            setTimeout(() => {
+                const lastHide = localStorage.getItem('hideInstallPopup');
+                const oneDay = 24 * 60 * 60 * 1000;
+                
+                if (!lastHide || (Date.now() - lastHide > oneDay)) {
+                    if (!isAppInstalled && deferredPrompt) {
+                        showInstallPopup();
+                    }
+                }
+            }, 3000);
+        });
+
+        // Listen for app installed event
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 Cyanix AI was installed');
+            isAppInstalled = true;
+            updateInstallStatus();
+        });
+
+        // Main install function
+        function installPWA() {
+            if (!deferredPrompt) {
+                showInstallInstructions();
+                return;
+            }
+            
+            deferredPrompt.prompt();
+            
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('✅ User accepted installation');
+                    
+                    // Update status
+                    const installStatus = document.getElementById('installStatus');
+                    installStatus.innerHTML = '🎉 Installing... Check home screen!';
+                    installStatus.className = 'install-status installed';
+                    
+                    // Hide install button
+                    const installBtn = document.getElementById('installBtn');
+                    if (installBtn) installBtn.style.display = 'none';
+                    
+                    // Close popup if open
+                    hideInstallPopup();
+                } else {
+                    console.log('❌ User dismissed installation');
+                }
+                
+                deferredPrompt = null;
+                updateInstallStatus();
+            });
+        }
+
+        // Install popup functions
+        function showInstallPopup() {
+            const popup = document.getElementById('installPopup');
+            if (popup) popup.style.display = 'block';
+        }
+
+        function hideInstallPopup() {
+            const popup = document.getElementById('installPopup');
+            if (popup) popup.style.display = 'none';
+            localStorage.setItem('hideInstallPopup', Date.now());
+        }
+
+        function showInstallInstructions() {
+            const platform = detectPlatform();
+            let instructions = '';
+            
+            switch(platform) {
+                case 'ios':
+                    instructions = `
+                        <strong>On iPhone/iPad:</strong><br>
+                        1. Tap the <strong>Share button</strong> (📤)<br>
+                        2. Scroll down, tap <strong>"Add to Home Screen"</strong><br>
+                        3. Tap <strong>"Add"</strong> in top right
+                    `;
+                    break;
+                    
+                case 'android':
+                    instructions = `
+                        <strong>On Android:</strong><br>
+                        1. Tap the <strong>three dots menu</strong> (⋮)<br>
+                        2. Tap <strong>"Install app"</strong><br>
+                        3. Tap <strong>"Install"</strong>
+                    `;
+                    break;
+                    
+                case 'desktop':
+                    instructions = `
+                        <strong>On Desktop:</strong><br>
+                        Look for the <strong>"➕" install icon</strong> in the address bar
+                    `;
+                    break;
+            }
+            
+            alert(`How to install Cyanix AI:\n\n${instructions.replace(/<br>/g, '\n').replace(/<strong>|<\/strong>/g, '')}`);
+        }
+
+        function detectPlatform() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (/iphone|ipad|ipod/.test(userAgent)) return 'ios';
+            if (/android/.test(userAgent)) return 'android';
+            return 'desktop';
+        }
+
+        // Initialize PWA status
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(updateInstallStatus, 1000);
+            setTimeout(updateInstallStatus, 3000);
+        });
+
+        // =============== Main App Functions ===============
         function login() {
             const apiKey = document.getElementById('apiKeyLoginInput').value.trim();
             
@@ -1342,22 +1819,17 @@ Remember:
                 return;
             }
 
-            // Validate API key format
             if (!apiKey.startsWith('gsk_')) {
                 alert('Invalid API key format. Groq keys start with "gsk_"');
                 return;
             }
 
-            // Save API key
             localStorage.setItem('groq_api_key', apiKey);
             API_CONFIG.groq.key = apiKey;
-
             currentUser = 'Anonymous User';
             
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('chatScreen').classList.add('active');
-
-            // Test API key and greet
             testAPIKeyOnLogin();
         }
 
@@ -1406,7 +1878,6 @@ Remember:
         }
 
         function logout() {
-            // Clear API key on logout for security
             localStorage.removeItem('groq_api_key');
             API_CONFIG.groq.key = '';
             
@@ -1443,7 +1914,6 @@ Remember:
             bubble.textContent = text;
             container.appendChild(bubble);
             
-            // Smooth scroll to bottom
             setTimeout(() => {
                 container.scrollTo({
                     top: container.scrollHeight,
@@ -1451,7 +1921,6 @@ Remember:
                 });
             }, 100);
 
-            // Save to history
             chatHistory.push({ text, isUser, timestamp: Date.now() });
         }
 
@@ -1460,7 +1929,6 @@ Remember:
             input.value = prompt;
             input.focus();
             
-            // Highlight the input briefly
             const wrapper = input.parentElement;
             wrapper.style.borderColor = 'var(--cyan-neon)';
             wrapper.style.boxShadow = '0 0 20px rgba(0, 243, 255, 0.5)';
@@ -1490,7 +1958,6 @@ Remember:
             const message = input.value.trim();
             if (!message) return;
 
-            // Check for special commands
             if (message.toLowerCase() === 'logout' || message.toLowerCase() === 'exit') {
                 logout();
                 return;
@@ -1499,7 +1966,6 @@ Remember:
             addMessage(message, true);
             input.value = '';
             
-            // Reset input height
             input.style.height = 'auto';
             const wrapper = input.parentElement;
             wrapper.style.minHeight = '40px';
@@ -1519,23 +1985,19 @@ Remember:
         }
 
         async function getAIResponse(userMessage) {
-            // Check if API key is configured
             if (!API_CONFIG.groq.key && !API_CONFIG.anthropic.key) {
                 throw new Error('No API keys configured. Please click "Configure API Keys" in the menu.');
             }
 
-            // Build conversation context with personality
             const systemPrompt = `${PERSONALITY}
 
 You are speaking to ${currentUser}. ${getModeInstructions()}`;
             
-            // Get recent chat history for context (last 10 messages)
             const recentHistory = chatHistory.slice(-10).map(msg => ({
                 role: msg.isUser ? 'user' : 'assistant',
                 content: msg.text
             }));
 
-            // Try Groq API first if key is available
             if (API_CONFIG.groq.key) {
                 try {
                     return await callGroqAPI(systemPrompt, recentHistory, userMessage);
@@ -1544,7 +2006,6 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
                 }
             }
             
-            // Fallback to Anthropic if available
             if (API_CONFIG.anthropic.key) {
                 try {
                     return await callAnthropicAPI(systemPrompt, recentHistory, userMessage);
@@ -1601,7 +2062,6 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
                     errorMessage = errorText;
                 }
                 
-                // Check for specific error types
                 if (response.status === 401) {
                     throw new Error('Invalid API key. Please check your Groq API key in settings.');
                 } else if (response.status === 429) {
@@ -1664,14 +2124,10 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
         }
 
         function autoResizeInput(textarea) {
-            // Reset height to auto to get the correct scrollHeight
             textarea.style.height = 'auto';
-            
-            // Calculate new height
-            const newHeight = Math.min(textarea.scrollHeight, 96); // Max 96px
+            const newHeight = Math.min(textarea.scrollHeight, 96);
             textarea.style.height = newHeight + 'px';
             
-            // Adjust wrapper height
             const wrapper = textarea.parentElement;
             wrapper.style.minHeight = '40px';
             wrapper.style.height = 'auto';
@@ -1716,14 +2172,12 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
             const dialog = document.getElementById('apiKeyDialog');
             dialog.classList.remove('hidden');
             
-            // Load existing keys (masked)
             const groqKey = localStorage.getItem('groq_api_key') || '';
             const anthropicKey = localStorage.getItem('anthropic_api_key') || '';
             
             document.getElementById('groqKeyInput').value = groqKey;
             document.getElementById('anthropicKeyInput').value = anthropicKey;
             
-            // Update status indicators
             updateAPIStatus();
             
             if (menuOpen) {
@@ -1739,7 +2193,6 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
             const groqKey = document.getElementById('groqKeyInput').value.trim();
             const anthropicKey = document.getElementById('anthropicKeyInput').value.trim();
             
-            // Save to localStorage
             if (groqKey) {
                 localStorage.setItem('groq_api_key', groqKey);
                 API_CONFIG.groq.key = groqKey;
@@ -1753,7 +2206,6 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
             updateAPIStatus();
             closeAPIKeyDialog();
             
-            // Test the API key
             if (groqKey) {
                 testAPIKey();
             } else {
@@ -1824,7 +2276,7 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
             }
         }
 
-        // Allow Enter key in login
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             const loginInput = document.getElementById('apiKeyLoginInput');
             if (loginInput) {
@@ -1834,7 +2286,6 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
             }
         });
 
-        // Initialize input area
         window.addEventListener('load', function() {
             const input = document.getElementById('messageInput');
             if (input) {
@@ -1846,7 +2297,6 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
                 }
             }
             
-            // Prevent zoom on iOS when focusing input
             if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
                 const viewport = document.querySelector('meta[name=viewport]');
                 if (viewport) {
@@ -1856,81 +2306,16 @@ You are speaking to ${currentUser}. ${getModeInstructions()}`;
         });
 
         // ==================== PWA Service Worker Registration ====================
-        // Register Service Worker for offline functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/CyanixAi/sw.js')
                     .then(function(registration) {
-                        console.log('✅ ServiceWorker registered successfully:', registration.scope);
-                        
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            console.log('🔄 Service Worker update found!');
-                            
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New update available, show update notification
-                                    if (confirm('A new version of Cyanix AI is available! Reload to update?')) {
-                                        window.location.reload();
-                                    }
-                                }
-                            });
-                        });
+                        console.log('✅ PWA Service Worker registered:', registration.scope);
                     })
                     .catch(function(error) {
-                        console.log('❌ ServiceWorker registration failed:', error);
+                        console.log('❌ Service Worker failed:', error);
                     });
             });
-        }
-
-        // Check if app is running as PWA
-        function isRunningAsPWA() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone === true ||
-                   document.referrer.includes('android-app://');
-        }
-
-        // Handle beforeinstallprompt event for install banner
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            
-            // Show custom install button (optional)
-            setTimeout(showInstallPromotion, 3000);
-        });
-
-        function showInstallPromotion() {
-            // Add install button to menu if it's not already there
-            const menuSection = document.querySelector('.menu-section:nth-child(3)');
-            if (menuSection && !document.getElementById('installPwaBtn')) {
-                const installBtn = document.createElement('button');
-                installBtn.id = 'installPwaBtn';
-                installBtn.className = 'menu-btn-item';
-                installBtn.innerHTML = '📲 Install App';
-                installBtn.onclick = showInstallPrompt;
-                menuSection.appendChild(installBtn);
-            }
-        }
-
-        function showInstallPrompt() {
-            if (deferredPrompt) {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('✅ User accepted install');
-                    } else {
-                        console.log('❌ User dismissed install');
-                    }
-                    deferredPrompt = null;
-                });
-            }
         }
     </script>
 </body>
